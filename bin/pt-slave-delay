@@ -4331,6 +4331,7 @@ sub main {
    # If the I/O thread isn't running when the program starts,
    # it never knows what to do.  So start it.
    $slave_dbh->do('START SLAVE IO_THREAD');
+   my $seconds_lagged;
 
    while (                              # Quit if:
       (!$o->get('run-time') || $now < $end) # time is exceeded
@@ -4392,6 +4393,7 @@ sub main {
 
       if ( defined $status->{seconds_behind_master} ) {
          info("slave running $status->{seconds_behind_master} seconds behind");
+         $seconds_lagged = $status->{seconds_behind_master};
       }
 
       # Get binlog position.
@@ -4425,7 +4427,7 @@ sub main {
                 # That happened because for an already lagged slave, $now
                 # isn't the correct time, but is actually
                 # $now - $seconds_lagged.
-                 $now - ( $status->{seconds_behind_master} || 0 ),
+                 $now - $seconds_lagged,
                  $status->{master_log_file},
                  $status->{read_master_log_pos}
             ];
