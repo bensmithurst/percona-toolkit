@@ -4331,7 +4331,7 @@ sub main {
    # If the I/O thread isn't running when the program starts,
    # it never knows what to do.  So start it.
    $slave_dbh->do('START SLAVE IO_THREAD');
-   my $seconds_lagged;
+   my $seconds_lagged = 0;
 
    while (                              # Quit if:
       (!$o->get('run-time') || $now < $end) # time is exceeded
